@@ -3,9 +3,36 @@ export interface ICategoryAttributes {
   Slug: string;
 }
 
+export interface IArticleAttributes {
+  Title: string;
+  Slug: string;
+  Article_Body: string;
+  Author_Name: string;
+  Publish_Date: string;
+  Image: IImageData;
+}
+
+export interface IImageData {
+  data: {
+    attributes: {
+      url: string;
+        formats: {
+          small: {
+            url: string;
+          };
+        };
+    }
+  }
+}
+
 export interface ICategory {
   id: number;
   attributes: ICategoryAttributes;
+}
+
+export interface IArticle {
+  id: number;
+  attributes: IArticleAttributes;
 }
 
 export interface ICollectionResponse<T> {
