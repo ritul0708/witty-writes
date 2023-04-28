@@ -38,11 +38,14 @@ const CategoryTab = ({ categories }: IPropType) => {
             return (
               <li 
                 key={category.id}
-                className={'mr-6 pb-4 border-b-4 rounded-sm' + `${
+                className={
+                  'mr-6 pb-4 border-b-4 rounded-sm' + 
+                  `${
                   isActiveLink(category) 
-                    ? 'border-primary text-primary'
+                    ? 'border-black text-primary'
                     : 'border-white text-gray-400'
-                }`}
+                  }`
+                }
               >
                 <Link href={`/category/${category.attributes.Slug}`}>{category.attributes.Title}</Link>
               </li>
