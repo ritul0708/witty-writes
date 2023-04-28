@@ -5,6 +5,7 @@ import { IArticle, ICategory, ICollectionResponse } from "@/types";
 import { AxiosResponse } from "axios";
 import type { GetServerSideProps, NextPage } from "next";
 import Head from "next/head";
+import qs from 'qs';
 
 interface IPropTypes {
   categories: {
@@ -12,11 +13,15 @@ interface IPropTypes {
   },
   articles: {
     items: IArticle[]
-  }
+  },
 }
 
 const Home: NextPage<IPropTypes> = ({ categories, articles }) => {
   // console.log(categories);
+  // console.log('***********************');
+  console.log(articles);
+  // console.log('*****************************');
+  // console.log(authors);
   return (
     <div>
       <Head>
@@ -31,13 +36,23 @@ const Home: NextPage<IPropTypes> = ({ categories, articles }) => {
 };
 
 export const getServerSideProps: GetServerSideProps = async () => {
+  const options = {
+    populate: ['author.avatar'],
+    sort: ['id:desc'],
+  };
+
+  const queryString = qs.stringify(options);
+  console.log(queryString);
+
   // categories
   const { data: categories }: AxiosResponse<ICollectionResponse<ICategory[]>> = await fetchCategories();
   // console.log(categories.data);
 
   // articles
-  const { data: articles }: AxiosResponse<ICollectionResponse<IArticle[]>> = await fetchArticles();
-  console.log(articles.data);
+  const { data: articles }: AxiosResponse<ICollectionResponse<IArticle[]>> = await fetchArticles(queryString);
+  // console.log(articles.data);
+
+
   return {
     props: {
       categories: {
@@ -46,7 +61,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
       articles: {
         items: articles.data,
         pagination: articles.meta.pagination,
-      }
+      },
     }
   }
 }
