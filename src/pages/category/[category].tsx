@@ -8,6 +8,7 @@ import { fetchArticles, fetchCategories } from '@/http';
 import { makeCategory, capitalizeFirstLetter } from '@/utils';
 import ArticleList from '@/components/ArticleList';
 import CategoryTab from '@/components/CategoryTab';
+import Pagination from '@/components/Pagination';
 
 interface IPropType {
   categories: {
@@ -22,6 +23,8 @@ interface IPropType {
 }
 
 const category = ({categories, articles, slug}: IPropType) => {
+  const {page, pageCount} = articles.pagination;
+
   const formattedCategory = () => {
     return capitalizeFirstLetter(makeCategory(slug))
   }
@@ -41,6 +44,7 @@ const category = ({categories, articles, slug}: IPropType) => {
         // handleOnSearch={debounce(handleSearch, 500)}
       />
       <ArticleList articles={articles.items} />
+      <Pagination page={page} pageCount={pageCount} />
     </>
   )
 }
@@ -52,8 +56,11 @@ export const getServerSideProps: GetServerSideProps = async ({query}) => {
     filters: {
       category: {
         slug: query.category
-      }
+      },
     },
+    pagination: {
+      page: query.page ? query.page : 1,
+    }
   };
 
   const queryString = qs.stringify(options);
