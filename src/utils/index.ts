@@ -18,3 +18,16 @@ export const makeCategory = (slug: string):string => {
 export const capitalizeFirstLetter = (str: string): string => {
   return str.charAt(0).toUpperCase() + str.slice(1);
 };
+
+export const debounce = (func: (query: string) => void, timeout=300) => {
+  let timer: NodeJS.Timeout;
+
+  const setDebounce = (...args: any) => {
+    clearTimeout(timer);
+
+    timer = setTimeout(() => {
+      func.apply(this, args)
+    }, timeout)
+  };
+  return setDebounce;
+}

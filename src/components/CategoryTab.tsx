@@ -5,17 +5,14 @@ import React from 'react';
 
 interface IPropType {
   categories: ICategory[];
+  handleSearch: (query: string) => void
 }
 
-const CategoryTab = ({ categories }: IPropType) => {
+const CategoryTab = ({ categories, handleSearch }: IPropType) => {
   const router = useRouter();
 
   const isActiveLink = (category: ICategory) => {
     return category.attributes.Slug === router.query.category;
-  }
-
-  const handleSearch = (query: string) => {
-    console.log('searching...')
   }
   
   return (

@@ -3,12 +3,14 @@ import Head from 'next/head';
 import React from 'react';
 import qs from 'qs';
 import { AxiosResponse } from 'axios';
-import { IArticle, ICategory, ICollectionResponse, IPagination } from '@/types';
+import { IArticle, ICategory, ICollectionResponse, IPagination, IQueryOptions } from '@/types';
 import { fetchArticles, fetchCategories } from '@/http';
 import { makeCategory, capitalizeFirstLetter } from '@/utils';
 import ArticleList from '@/components/ArticleList';
 import CategoryTab from '@/components/CategoryTab';
 import Pagination from '@/components/Pagination';
+import { debounce } from '@/utils';
+import { useRouter } from 'next/router';
 
 interface IPropType {
   categories: {
@@ -23,11 +25,17 @@ interface IPropType {
 }
 
 const category = ({categories, articles, slug}: IPropType) => {
+  const router = useRouter();
   const {page, pageCount} = articles.pagination;
+  const { category: categorySlug } = router.query;
 
   const formattedCategory = () => {
     return capitalizeFirstLetter(makeCategory(slug))
   }
+
+  const handleSearch = (query: string) => {
+    router.push(`/category/${categorySlug}/?search=${query}`);
+  };
 
   return (
     <>
@@ -41,16 +49,20 @@ const category = ({categories, articles, slug}: IPropType) => {
       </Head>
       <CategoryTab
         categories={categories.items}
-        // handleOnSearch={debounce(handleSearch, 500)}
+        handleSearch={debounce(handleSearch, 500)}
       />
       <ArticleList articles={articles.items} />
-      <Pagination page={page} pageCount={pageCount} />
+      <Pagination 
+        page={page} 
+        pageCount={pageCount} 
+        redirectUrl={`/category/${categorySlug}`}
+    />
     </>
   )
 }
 
 export const getServerSideProps: GetServerSideProps = async ({query}) => {
-  const options = {
+  const options: Partial<IQueryOptions> = {
     populate: ['author.avatar'],
     sort: ['id:desc'],
     filters: {
@@ -59,9 +71,18 @@ export const getServerSideProps: GetServerSideProps = async ({query}) => {
       },
     },
     pagination: {
-      page: query.page ? query.page : 1,
+      page: query.page ? +query.page : 1,
+      pageSize: 1
     }
   };
+
+  if(query.search) {
+    options.filters = {
+      Title: {
+        $contains: query.search,
+      }
+    }
+  }
 
   const queryString = qs.stringify(options);
 
